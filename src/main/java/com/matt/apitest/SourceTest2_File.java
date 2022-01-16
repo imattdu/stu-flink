@@ -15,7 +15,7 @@ public class SourceTest2_File {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         //env.setParallelism(1);
-        DataStream<String> dataStream = env.readTextFile("D:\\matt\\workspace\\idea\\hadoop\\studyflink\\src\\main\\resources\\sensor.txt");
+        DataStream<String> dataStream = env.readTextFile("D:\\matt\\workspace\\idea\\hadoop\\study-flink\\src\\main\\resources\\sensor.txt");
 
         dataStream.print("file");
 
