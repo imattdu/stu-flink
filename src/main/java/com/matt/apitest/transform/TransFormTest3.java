@@ -16,7 +16,7 @@ public class TransFormTest3 {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(16);
-        DataStream<String> inputStream = env.readTextFile("D:\\matt\\workspace\\idea\\hadoop\\study-flink\\src\\main\\resources\\sensor.txt");
+        DataStream<String> inputStream = env.readTextFile("/Users/matt/workspace/java/bigdata/study-flink/src/main/resources/sensor.txt");
 
         DataStream<SensorReading> dataStream = inputStream.map(s -> {
             String[] fields = s.split(",");

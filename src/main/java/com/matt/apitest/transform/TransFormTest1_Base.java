@@ -12,13 +12,14 @@ import java.io.File;
 /**
  * @author matt
  * @create 2022-01-16 17:16
+ * map flatmap filter
  */
 public class TransFormTest1_Base {
 
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(16);
-        DataStream<String> inputStream = env.readTextFile("D:\\matt\\workspace\\idea\\hadoop\\study-flink\\src\\main\\resources\\sensor.txt");
+        DataStream<String> inputStream = env.readTextFile("/Users/matt/workspace/java/bigdata/study-flink/src/main/resources/sensor.txt");
 
         // 1 map string -> len(string)
         // 方-》园
@@ -28,6 +29,8 @@ public class TransFormTest1_Base {
                 return s.length();
             }
         });
+
+        // mapStream.print("map");
 
         // flatMap 按逗号切分字端
 

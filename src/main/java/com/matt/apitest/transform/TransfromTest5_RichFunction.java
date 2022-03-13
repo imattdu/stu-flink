@@ -26,7 +26,7 @@ public class TransfromTest5_RichFunction {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(4);
-        DataStream<String> inputStream = env.readTextFile("D:\\matt\\workspace\\idea\\hadoop\\study-flink\\src\\main\\resources\\sensor.txt");
+        DataStream<String> inputStream = env.readTextFile("/Users/matt/workspace/java/bigdata/study-flink/src/main/resources/sensor.txt");
 
         DataStream<SensorReading> dataStream = inputStream.map(s -> {
             String[] fields = s.split(",");
@@ -34,50 +34,8 @@ public class TransfromTest5_RichFunction {
         });
 
 
-        //1. 分流
-        SplitStream<SensorReading> splitStream = dataStream.split(new OutputSelector<SensorReading>() {
-            @Override
-            public Iterable<String> select(SensorReading sensorReading) {
-                return (sensorReading.getTemperatrue() > 30) ? Collections.singletonList("high") :
-                        Collections.singletonList("low") ;
-            }
-        });
 
-        DataStream<SensorReading> highTempStream = splitStream.select("high");
-        DataStream<SensorReading> lowTempStream = splitStream.select("low");
-
-
-
-
-        DataStream<Tuple2<String, Double>> warningStream = highTempStream.map(new MapFunction<SensorReading, Tuple2<String, Double>>() {
-            @Override
-            public Tuple2<String, Double> map(SensorReading v) throws Exception {
-                return new Tuple2<>(v.getId(), v.getTemperatrue());
-            }
-        });
-
-        ConnectedStreams<Tuple2<String, Double>, SensorReading> connectedStreams = warningStream.connect(lowTempStream);
-
-
-        SingleOutputStreamOperator<Object> res = connectedStreams.map(new CoMapFunction<Tuple2<String, Double>, SensorReading, Object>() {
-            @Override
-            public Object map1(Tuple2<String, Double> v) throws Exception {
-                return new Tuple3<>(v.f0, v.f1, "high temp warning");
-            }
-
-            @Override
-            public Object map2(SensorReading v) throws Exception {
-                return new Tuple2<>(v.getId(), "normal");
-            }
-        });
-
-
-
-
-        DataStream<SensorReading> union = highTempStream.union(lowTempStream);
-
-
-        DataStream<Tuple2<String, Integer>> resStream = union.map(
+        DataStream<Tuple2<String, Integer>> resStream = dataStream.map(
                 new MyMapper()
         );
         resStream.print();
@@ -88,13 +46,6 @@ public class TransfromTest5_RichFunction {
 
     }
 
-    public static class MyMapper0 implements MapFunction<SensorReading, Tuple2<String, Integer>>{
-
-        @Override
-        public Tuple2<String, Integer> map(SensorReading v) throws Exception {
-            return new Tuple2<>(v.getId(), v.getId().length());
-        }
-    }
 
     public static class MyMapper extends RichMapFunction<SensorReading, Tuple2<String, Integer>> {
 

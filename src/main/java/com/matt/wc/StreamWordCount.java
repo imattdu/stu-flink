@@ -20,7 +20,7 @@ public class StreamWordCount {
         // 默认是cpu核数
         // env.setParallelism(16);
         // 从文件中读取数据
-        //String inputPath = "D:\\matt\\workspace\\idea\\hadoop\\studyflink\\src\\main\\resources\\hello.txt";
+        //String inputPath = "/Users/matt/workspace/java/bigdata/study-flink/src/main/resources/hello.txt";
         //DataStream<String> inputDataStream = env.readTextFile(inputPath);
 
         // nc 输入
@@ -36,11 +36,13 @@ public class StreamWordCount {
         DataStream<Tuple2<String, Integer>> resultStream = inputDataStream.flatMap(new WordCount.MyFlatMapper())
                 .keyBy(0)
                 .sum(1).setParallelism(2).startNewChain();
-        // .disableChaining();
         // 和前后都不合并任务
+        // .disableChaining();
 
-        // .startNewChain()
+
         // 开始一个新的任务链合并 前面断开 后面不断开
+        // .startNewChain()
+
         resultStream.print().setParallelism(1);
 
         // 执行任务

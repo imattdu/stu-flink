@@ -15,24 +15,27 @@ public class WordCount {
 
 
     public static void main(String[] args) throws Exception {
-        // 创建执行环境
+        // 1 创建执行环境
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
-        // 从文件中读取数据
-        String inputPath = "D:\\matt\\workspace\\idea\\hadoop\\studyflink\\src\\main\\resources\\hello.txt";
+        // 2 从文件中读取数据
+        String inputPath = "/Users/matt/workspace/java/bigdata/study-flink/src/main/resources/hello.txt";
         DataSet<String> inputDataSet = env.readTextFile(inputPath);
 
-        // 对数据集处理 按照空格分词展开 -》 （word, 1）
+        // 3 对数据集处理 按照空格分词展开 -》 （word, 1）
         // flatMap map 操作
         DataSet<Tuple2<String, Integer>> resSet = inputDataSet.flatMap(new MyFlatMapper())
                 // 按照第一个位置分组
                 .groupBy(0)
                 // 将第二个位置上的数据求和
                 .sum(1);
+
+        // 4.输出
         resSet.print();
 
     }
 
+    // 输入 输出
     public static class MyFlatMapper implements FlatMapFunction<String, Tuple2<String, Integer>> {
 
         @Override

@@ -20,7 +20,7 @@ public class TransFormTest1_RollingAggregation {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(16);
-        DataStream<String> inputStream = env.readTextFile("D:\\matt\\workspace\\idea\\hadoop\\study-flink\\src\\main\\resources\\sensor.txt");
+        DataStream<String> inputStream = env.readTextFile("/Users/matt/workspace/java/bigdata/study-flink/src/main/resources/sensor.txt");
         
         // SensorReading
         //DataStream<SensorReading> dataStream = inputStream.map(new MapFunction<String, SensorReading>() {
@@ -46,8 +46,9 @@ public class TransFormTest1_RollingAggregation {
 
         // maxBy 最大的那条记录 没有她大 非max字段也要改
         // max 最大值那条字段
-        DataStream<SensorReading> resultStream = keyedStream.max("temperatrue");
+        DataStream<SensorReading> resultStream = keyedStream.maxBy("temperatrue");
         resultStream.print();
+        // keyedStream.print("keyed");
         // job name
         env.execute("trans-form");
 
