@@ -7,7 +7,9 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.source.ParallelSourceFunction;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -90,23 +92,16 @@ public class SourceTest4_UDF {
         public void run(SourceContext<Event> ctx) throws InterruptedException {
             // 随机数发生器
             Random random = new Random();
-
-            HashMap<String, Long> sensorTempMap = new HashMap<>();
-            for (int i = 0; i < 5; i++) {
-                sensorTempMap.put("sensor_" + (i + 1), System.currentTimeMillis());
-            }
+            List<String> userList = Arrays.asList("matt", "jack", "lisi", "lb", "df");
+            List<String> urlList = Arrays.asList("/save", "/remove", "/update", "/list", "/detail");
 
             while (running) {
-                for (String sensorId : sensorTempMap.keySet()) {
-                    // 当前温度随机波动
-                    //Long ts = sensorTempMap.get(sensorId) + new Random().nextInt(1000000);
-                    //sensorTempMap.put(sensorId, ts);
-                    int i = random.nextInt(5);
-                    ctx.collect(new Event(String.valueOf(i), "matt", System.currentTimeMillis()));
+
+                for (int i = 0; i < 5; i++) {
+                    int randV = random.nextInt(5);
+                    ctx.collect(new Event(userList.get(randV), urlList.get(randV), System.currentTimeMillis()));
                     Thread.sleep(1000L);
                 }
-                // 控制输出评率
- 
             }
         }
 
