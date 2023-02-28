@@ -2,23 +2,33 @@ package com.matt.wc;
 
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.util.Collector;
 
-public class StreamWordCount {
+/**
+ * @author matt
+ * @create 2022-01-06 0:45
+ */
+// 流处理
+public class BoundedStreamWordCount {
+
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         // 默认是cpu核数
         // env.setParallelism(16);
         // 从文件中读取数据
+        String inputPath = "/Users/matt/workspace/java/stu/stu-flink/src/main/resources/hello.txt";
+        DataStream<String> inputDataStream = env.readTextFile(inputPath);
 
         // nc 输入
-         ParameterTool parameterTool = ParameterTool.fromArgs(args);
-        String host = parameterTool.get("host");
-        int port = parameterTool.getInt("port");
-        DataStream<String> inputDataStream = env.socketTextStream(host, port);
+        // parameter tool
+        // ParameterTool parameterTool = ParameterTool.fromArgs(args);
+        //String host = parameterTool.get("host");
+        //int port = parameterTool.getInt("port");
+        //
+        //DataStream<String> inputDataStream = env.socketTextStream(host, port);
+
 
         // 基于数据流进行转换计算
         DataStream<Tuple2<String, Long>> resultStream = inputDataStream.flatMap(
@@ -29,15 +39,18 @@ public class StreamWordCount {
                             }
                         }
                 ).returns(Types.TUPLE(Types.STRING, Types.LONG))
-                // 设置共享组 在同一个共享组才可以共享 默认都在 default 共享组
-                .slotSharingGroup("1")
                 .keyBy(data -> data.f0)
-                .sum(1);
+                .sum(1); // .setParallelism(2).startNewChain();
+        // 和前后都不合并任务
+        // .disableChaining();
 
-        resultStream.print();
+
+        // 开始一个新的任务链合并 前面断开 后面不断开
+        // .startNewChain()
+
+        resultStream.print(); //.setParallelism(1);
 
         // 执行任务
         env.execute();
     }
-
 }

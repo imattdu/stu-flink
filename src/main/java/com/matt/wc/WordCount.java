@@ -1,6 +1,7 @@
 package com.matt.wc;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -19,12 +20,19 @@ public class WordCount {
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
         // 2 从文件中读取数据
-        String inputPath = "/Users/matt/workspace/java/bigdata/study-flink/src/main/resources/hello.txt";
+        String inputPath = "/Users/matt/workspace/java/stu/stu-flink/src/main/resources/hello.txt";
         DataSet<String> inputDataSet = env.readTextFile(inputPath);
 
         // 3 对数据集处理 按照空格分词展开 -》 （word, 1）
         // flatMap map 操作
-        DataSet<Tuple2<String, Integer>> resSet = inputDataSet.flatMap(new MyFlatMapper())
+        DataSet<Tuple2<String, Long>> resSet = inputDataSet.flatMap(
+                        // 分词
+                        (String line, Collector<Tuple2<String, Long>> out) -> {
+                            String[] inputArr = line.split(" ");
+                            for (String i : inputArr) {
+                                out.collect(new Tuple2<>(i, 1L));
+                            }
+                        }).returns(Types.TUPLE(Types.STRING, Types.LONG))
                 // 按照第一个位置分组
                 .groupBy(0)
                 // 将第二个位置上的数据求和
@@ -49,7 +57,5 @@ public class WordCount {
             }
         }
     }
-
-
 
 }
